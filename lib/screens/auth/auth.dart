@@ -1,5 +1,7 @@
 import 'package:chat/utils/images.dart';
 import 'package:chat/widget/textfield.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -111,11 +113,29 @@ class _AuthScreenState extends State<AuthScreen> {
   final form = GlobalKey<FormState>();
   var _enteredEmail = '';
   var _enteredPassword = '';
-  void submit() {
+  void submit() async {
     final valid = form.currentState!.validate();
-    if (valid) {
-      form.currentState!.save();
+    if (!valid) {
+      return;
     }
-    print('$_enteredEmail $_enteredPassword');
+    if (_isLogin) {
+    } else {
+      try {
+        UserCredential user = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+                email: _enteredEmail, password: _enteredPassword);
+        print(user);
+      } on FirebaseException catch (e) {
+        if (e.code == 'email-already-in-use:') {
+          //....
+        }
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message ?? 'Authentication Failed'),
+          ),
+        );
+      }
+    }
   }
 }
