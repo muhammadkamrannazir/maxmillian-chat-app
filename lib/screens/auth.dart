@@ -1,7 +1,6 @@
 import 'package:chat/utils/images.dart';
 import 'package:chat/widget/textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -11,6 +10,7 @@ class AuthScreen extends StatefulWidget {
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
+//adf
 class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                   !value.contains('@')) {
                                 return 'Please enter a valid email address.';
                               }
-                              return '';
+                              return null;
                             },
                             onSaved: (value) {
                               _enteredEmail = value!;
@@ -66,7 +66,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                   value.length < 6) {
                                 return 'Password should be atleast 6 character long';
                               }
-                              return '';
+                              return null;
                             },
                             onSaved: (value) {
                               _enteredPassword = value!;
@@ -118,24 +118,29 @@ class _AuthScreenState extends State<AuthScreen> {
     if (!valid) {
       return;
     }
-    if (_isLogin) {
-    } else {
-      try {
-        UserCredential user = await FirebaseAuth.instance
+    form.currentState!.save();
+    try {
+      if (_isLogin) {
+        final userCredential = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(
+                email: _enteredEmail, password: _enteredPassword);
+        (userCredential);
+      } else {
+        final userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
                 email: _enteredEmail, password: _enteredPassword);
-        print(user);
-      } on FirebaseException catch (e) {
-        if (e.code == 'email-already-in-use:') {
-          //....
-        }
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.message ?? 'Authentication Failed'),
-          ),
-        );
+        (userCredential);
       }
+    } on FirebaseException catch (e) {
+      if (e.code == 'email-already-in-use:') {
+        //....
+      }
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message ?? 'Authentication Failed'),
+        ),
+      );
     }
   }
 }

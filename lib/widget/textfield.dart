@@ -6,7 +6,7 @@ class CustomTextField extends StatelessWidget {
   bool? autocorrect;
   TextCapitalization? textCapitalization;
   bool? obscureText;
-  String Function(String?)? validator;
+  String? Function(String?)? validator;
   void Function(String?)? onSaved;
   CustomTextField({
     this.labelText,
