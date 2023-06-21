@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "16498839230",
+    "project_id": "maxmillian-chat",
+    "storage_bucket": "maxmillian-chat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:16498839230:android:1d6ecb59ab58b4ea4998ef",
+        "android_client_info": {
+          "package_name": "com.maximillian.chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "16498839230-g15ephnqpkvbeigbk2homdkq67hb1kas.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxRWosOkgIf3MavApYe6J-N39WCTIvgbk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "16498839230-g15ephnqpkvbeigbk2homdkq67hb1kas.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "16498839230-vtfofk2ui9k4f71rut9uu2rjcihkh956.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.maximillian.chat"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
