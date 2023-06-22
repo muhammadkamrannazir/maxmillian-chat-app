@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:chat/utils/images.dart';
+import 'package:chat/widget/image_picker.dart';
 import 'package:chat/widget/textfield.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -40,6 +45,12 @@ class _AuthScreenState extends State<AuthScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          if (!_isLogin)
+                            UserImagePicker(
+                              onPickImage: (pickedImage) {
+                                _selectedImage = pickedImage;
+                              },
+                            ),
                           CustomTextField(
                             labelText: 'Email',
                             keyboardType: TextInputType.emailAddress,
@@ -73,29 +84,33 @@ class _AuthScreenState extends State<AuthScreen> {
                             },
                           ),
                           const SizedBox(height: 30),
-                          ElevatedButton(
-                            onPressed: submit,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
+                          if (isAuthenticating)
+                            const CircularProgressIndicator(),
+                          if (!isAuthenticating)
+                            ElevatedButton(
+                              onPressed: submit,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer,
+                              ),
+                              child: Text(
+                                _isLogin ? 'Login' : 'Register',
+                              ),
                             ),
-                            child: Text(
-                              _isLogin ? 'Login' : 'Register',
+                          if (!isAuthenticating)
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isLogin = !_isLogin;
+                                });
+                              },
+                              child: Text(
+                                _isLogin
+                                    ? "Don't have an account?"
+                                    : 'Already have an account!',
+                              ),
                             ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _isLogin = !_isLogin;
-                              });
-                            },
-                            child: Text(
-                              _isLogin
-                                  ? "Don't have an account?"
-                                  : 'Already have an account!',
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -113,13 +128,21 @@ class _AuthScreenState extends State<AuthScreen> {
   final form = GlobalKey<FormState>();
   var _enteredEmail = '';
   var _enteredPassword = '';
+  File? _selectedImage;
+  bool isAuthenticating = false;
+
   void submit() async {
     final valid = form.currentState!.validate();
-    if (!valid) {
+    if (!valid || _selectedImage == null && !_isLogin) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('All Fields are required')));
       return;
     }
     form.currentState!.save();
     try {
+      setState(() {
+        isAuthenticating = true;
+      });
       if (_isLogin) {
         final userCredential = await FirebaseAuth.instance
             .signInWithEmailAndPassword(
@@ -130,6 +153,21 @@ class _AuthScreenState extends State<AuthScreen> {
             .createUserWithEmailAndPassword(
                 email: _enteredEmail, password: _enteredPassword);
         (userCredential);
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('users_images')
+            .child('.${userCredential.user!.uid}jpg');
+        await storageRef.putFile(_selectedImage!);
+        final imagesURL = await storageRef.getDownloadURL();
+        (imagesURL);
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set({
+          'userName': 'name',
+          'email': _enteredEmail,
+          'imageURL': imagesURL,
+        });
       }
     } on FirebaseException catch (e) {
       if (e.code == 'email-already-in-use:') {
@@ -141,6 +179,9 @@ class _AuthScreenState extends State<AuthScreen> {
           content: Text(e.message ?? 'Authentication Failed'),
         ),
       );
+      setState(() {
+        isAuthenticating = false;
+      });
     }
   }
 }
