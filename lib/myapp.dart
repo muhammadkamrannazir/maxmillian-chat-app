@@ -1,5 +1,5 @@
 import 'package:chat/screens/auth.dart';
-import 'package:chat/screens/chat.dart';
+import 'package:chat/screens/home.dart';
 import 'package:chat/screens/splash.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
             return const SplashScreen();
           }
           if (snapshot.hasData) {
-            return const ChatScreen();
+            return const HomeScreen();
           }
           return const AuthScreen();
         }),

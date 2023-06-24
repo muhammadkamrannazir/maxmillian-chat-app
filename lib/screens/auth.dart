@@ -51,6 +51,25 @@ class _AuthScreenState extends State<AuthScreen> {
                                 _selectedImage = pickedImage;
                               },
                             ),
+                          if (!_isLogin)
+                          CustomTextField(
+                            labelText: 'Username',
+                            keyboardType: TextInputType.emailAddress,
+                            autocorrect: false,
+                            textCapitalization: TextCapitalization.sentences,
+                            enableSuggestions: false,
+                            validator: (value) {
+                              if (value == null ||
+                                  value.trim().isEmpty ||
+                                  value.length < 4) {
+                                return 'Please enter a valid Username.';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _enteredName = value!;
+                            },
+                          ),
                           CustomTextField(
                             labelText: 'Email',
                             keyboardType: TextInputType.emailAddress,
@@ -127,6 +146,7 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isLogin = true;
   final form = GlobalKey<FormState>();
   var _enteredEmail = '';
+  var _enteredName = '';
   var _enteredPassword = '';
   File? _selectedImage;
   bool isAuthenticating = false;
@@ -164,9 +184,9 @@ class _AuthScreenState extends State<AuthScreen> {
             .collection('users')
             .doc(userCredential.user!.uid)
             .set({
-          'userName': 'name',
+          'username': _enteredName,
           'email': _enteredEmail,
-          'imageURL': imagesURL,
+          'imageUrl': imagesURL,
         });
       }
     } on FirebaseException catch (e) {

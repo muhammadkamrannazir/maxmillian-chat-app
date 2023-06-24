@@ -8,6 +8,7 @@ class CustomTextField extends StatelessWidget {
   bool? obscureText;
   String? Function(String?)? validator;
   void Function(String?)? onSaved;
+  bool enableSuggestions;
   CustomTextField({
     this.labelText,
     this.keyboardType,
@@ -16,6 +17,7 @@ class CustomTextField extends StatelessWidget {
     this.obscureText,
     this.validator,
     this.onSaved,
+    this.enableSuggestions = true,
     super.key,
   });
 
@@ -31,6 +33,7 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscureText ?? false,
       validator: validator,
       onSaved: onSaved,
+      enableSuggestions: enableSuggestions,
     );
   }
 }
