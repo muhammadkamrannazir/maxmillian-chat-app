@@ -1,3 +1,4 @@
+// @dart=3.0
 import 'package:chat/firebase_options.dart';
 import 'package:chat/myapp.dart';
 import 'package:firebase_core/firebase_core.dart';
